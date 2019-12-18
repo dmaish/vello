@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Card, Icon, Avatar,Carousel, Col, Row } from 'antd';
+import { Layout, Card, Icon, Modal, PageHeader, Carousel, Col, Row,  Form, Input} from 'antd';
 import 'antd/dist/antd.css';
 import * as firebase from "firebase/app";
 import "firebase/auth";
@@ -9,6 +9,8 @@ import "firebase/database";
 import firebaseObj from './../firebase';
 import { fetchAllFoodAction } from '../redux/actions';
 import foodSeedData from './../helpers';
+import logo from './../assets/applogo.png';
+import './homepage.css';
 
 
 
@@ -17,6 +19,12 @@ export class HomePage extends Component {
 
 state = {
   allFood: null,
+  visible: false,
+  confirmLoading: false,
+  username: null,
+  password: null,
+  loginMesCol: '#ffffff',
+  unLoginMesCol: '#ffffff',
 }
 
 seedData = async() => {
@@ -52,6 +60,91 @@ static getDerivedStateFromProps(props, state) {
   return null;
 }
 
+// modal functionalities.
+
+showSignInModal = () => {
+  this.setState({
+    visible: true,
+  });
+}
+
+handleInputChange = (e) => {
+  e.preventDefault();
+  e.persist();
+
+
+        this.setState((state) => {
+            let inputId = e.target.id;
+            state[inputId] = e.target.value;
+            console.log('event', this.state.password);
+            return state;
+        });
+}
+
+handleOk = () => {
+  const {username, password} = this.state;
+
+  console.log('form attributes', this.state.username);
+  if (username === 'admin254' && password === 'password254'){
+      this.setState({
+        loginMesCol: '#00CC00',
+      });
+  } else {
+    this.setState({
+      unLoginMesCol: 'red',
+    })
+  }
+
+  setTimeout(() => {
+    this.setState({
+      visible: false,
+      confirmLoading: false,
+    });
+  }, 2000);
+};
+
+
+
+
+renderSignInModal = () => {
+  const FormItem = Form.Item;
+  const { visible, confirmLoading } = this.state;
+
+  return(
+
+      <Modal
+        title="admin login"
+        visible={visible}
+        onOk={this.handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={this.handleCancel}>
+          <Form onSubmit={this.handleSubmit} autocomplete="off" >
+              <FormItem
+              label="username"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+            >
+              <Input id="username" name="username" type='text' placeholder="username" autoComplete="off" onChange={(e) => this.handleInputChange(e)}/>
+            </FormItem>
+
+            <FormItem
+              label="password"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+            >
+              <Input id="password" type="password" placeholder="Password" autoComplete="off" onChange={(e) => this.handleInputChange(e)}/>
+            </FormItem>
+          </Form>
+
+          <div style={{color: this.state.unLoginMesCol}}>wrong password / username.</div>
+          <div style={{color: this.state.loginMesCol}}>successful login, welcome.</div>
+      </Modal>
+
+  );
+}
+
+
+
 renderCardItems = () => {
   const { Meta } = Card;
   const allFood = this.state.allFood;
@@ -60,11 +153,12 @@ renderCardItems = () => {
     textAlign: 'center',
     };
 
-   return Object.keys(allFood).map((item) => {
+  return Object.keys(allFood).map((item) => {
     let foodItemObject = allFood[item];
     return (<Col span={6}>
       <div style={{marginTop: '20px'}}>
       <Card
+          hoverable={true}
           style={{ gridStyle }}
           cover={
               <div 
@@ -85,9 +179,9 @@ renderCardItems = () => {
             <Icon type="ellipsis" key="ellipsis" />,
           ]}
         >
+        <Meta style={{borderBottom: 'solid 0.2px #F5F5F5', marginBottom: '15px'}} title={item}/>
         <Meta
-          avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-          title={foodItemObject.price}
+          title={`${foodItemObject.price} ksh.`}
           description={foodItemObject.description}
         />
       </Card>
@@ -104,7 +198,14 @@ renderCardItems = () => {
         <div>
           <Layout style={{width: "100vw"}}>
             <Header style={{ background: '#fff', padding: 0 }}>
-              vello foods
+            <PageHeader
+                title="Vello Foods"
+                extra={[
+                  <span style={{cursor: 'pointer'}} key="3">orders</span>,
+                  <span style={{cursor: 'pointer'}} key="2" onClick={this.showSignInModal}>admin</span>
+                ]}
+              ></PageHeader>
+
             </Header>
             <Content>
             <Carousel autoplay style={{
@@ -114,16 +215,35 @@ renderCardItems = () => {
                 overflow: 'hidden',
               }}>
                 <div>
-                  <h3>1</h3>
+                    <div className="carousel-item-1"
+                    style={{
+                    height:'50vh',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    }}>
+                    </div>
                 </div>
                 <div>
-                  <h3>2</h3>
+                <div className="carousel-item-2"
+                    style={{
+                    height:'55vh',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    }}>
+                      should display image
+                    </div>
                 </div>
                 <div>
-                  <h3>3</h3>
-                </div>
-                <div>
-                  <h3>4</h3>
+                <div 
+                    className="carousel-item-3"
+                    style={{
+                    height:'50vh',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    }}>
+                      should display image
+                    </div>
                 </div>
             </Carousel>
 
@@ -132,6 +252,8 @@ renderCardItems = () => {
                   {this.renderCardItems()}
               </Row>
             </div>
+
+              {this.renderSignInModal()}
 
             </Content>
             <Footer></Footer>
