@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Layout, Card, Icon, Modal, PageHeader, Carousel, Col, Row,  Form, Input} from 'antd';
 import 'antd/dist/antd.css';
-import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
+import { Redirect, withRouter  } from 'react-router-dom'
 
 import firebaseObj from './../firebase';
 import { fetchAllFoodAction } from '../redux/actions';
 import foodSeedData from './../helpers';
-import logo from './../assets/applogo.png';
+// import logo from './../assets/applogo.png';
 import './homepage.css';
 
 
@@ -101,6 +101,10 @@ handleOk = () => {
       confirmLoading: false,
     });
   }, 2000);
+
+  // redirect to dashboard component.
+  window.location.replace("/dashboard");
+  window.location.href = "dashboard";
 };
 
 
@@ -276,4 +280,4 @@ const mapStateToProps = (state) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(HomePage)
+)(HomePage);
