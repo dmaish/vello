@@ -4,16 +4,13 @@ import { Layout, Card, Icon, Modal, PageHeader, Carousel, Col, Row,  Form, Input
 import 'antd/dist/antd.css';
 import "firebase/auth";
 import "firebase/database";
-import { Redirect, withRouter  } from 'react-router-dom'
 
-import firebaseObj from './../firebase';
+import AddFoodSection from './../components/addFoodSection';
+// import firebaseObj from './../firebase';
 import { fetchAllFoodAction } from '../redux/actions';
-import foodSeedData from './../helpers';
+// import foodSeedData from './../helpers';
 // import logo from './../assets/applogo.png';
 import './homepage.css';
-
-
-
 
 export class HomePage extends Component {
 
@@ -25,28 +22,29 @@ state = {
   password: null,
   loginMesCol: '#ffffff',
   unLoginMesCol: '#ffffff',
+  userView: false,
 }
 
-seedData = async() => {
-  for(let foodItem in foodSeedData){
-    let foodObj = foodSeedData[foodItem];
-    let price = foodObj.price;
-    let onOffer = foodObj.onOffer;
-    let photo = foodObj.photo;
-    let description = foodObj.description;
+// seedData = async() => {
+//   for(let foodItem in foodSeedData){
+    // let foodObj = foodSeedData[foodItem];
+    // let price = foodObj.price;
+    // let onOffer = foodObj.onOffer;
+    // let photo = foodObj.photo;
+    // let description = foodObj.description;
 
-    await firebaseObj.database().ref(`/data/${foodItem}`).set({
-      price,
-      onOffer,
-      photo,
-      description,
-    })
+    // await firebaseObj.database().ref(`/data/${foodItem}`).set({
+    //   price,
+    //   onOffer,
+    //   photo,
+    //   description,
+    // })
 
-  }
-}
+//   }
+// }
 
 componentDidMount(){
-  this.seedData();
+  // this.seedData();
   const {fetchAllFoodAction} = this.props;
   fetchAllFoodAction();
 }
@@ -84,10 +82,10 @@ handleInputChange = (e) => {
 handleOk = () => {
   const {username, password} = this.state;
 
-  console.log('form attributes', this.state.username);
   if (username === 'admin254' && password === 'password254'){
       this.setState({
         loginMesCol: '#00CC00',
+        userView: false,
       });
   } else {
     this.setState({
@@ -99,15 +97,12 @@ handleOk = () => {
     this.setState({
       visible: false,
       confirmLoading: false,
+      unLoginMesCol: '#ffffff',
+      loginMesCol: '#ffffff'
     });
   }, 2000);
 
-  // redirect to dashboard component.
-  window.location.replace("/dashboard");
-  window.location.href = "dashboard";
 };
-
-
 
 
 renderSignInModal = () => {
@@ -128,7 +123,7 @@ renderSignInModal = () => {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
             >
-              <Input id="username" name="username" type='text' placeholder="username" autoComplete="off" onChange={(e) => this.handleInputChange(e)}/>
+              <Input id="username" name="username"  placeholder="username" autoComplete="off" onChange={(e) => this.handleInputChange(e)}/>
             </FormItem>
 
             <FormItem
@@ -136,7 +131,7 @@ renderSignInModal = () => {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
             >
-              <Input id="password" type="password" placeholder="Password" autoComplete="off" onChange={(e) => this.handleInputChange(e)}/>
+              <Input id="password"   placeholder="Password"  onChange={(e) => this.handleInputChange(e)}/>
             </FormItem>
           </Form>
 
@@ -147,6 +142,48 @@ renderSignInModal = () => {
   );
 }
 
+renderCarousel = () => {
+  return( 
+      <Carousel autoplay style={{
+        textAlign: 'center',
+        height: '25vw',
+        background: '#364d79',
+        overflow: 'hidden',
+        }}>
+          <div>
+              <div className="carousel-item-1"
+              style={{
+              height:'50vh',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              }}>
+              </div>
+          </div>
+          <div>
+          <div className="carousel-item-2"
+              style={{
+              height:'55vh',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              }}>
+                should display image
+              </div>
+          </div>
+          <div>
+          <div 
+              className="carousel-item-3"
+              style={{
+              height:'50vh',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              }}>
+                should display image
+              </div>
+          </div>
+      </Carousel>
+    );
+}
 
 
 renderCardItems = () => {
@@ -209,47 +246,20 @@ renderCardItems = () => {
                   <span style={{cursor: 'pointer'}} key="2" onClick={this.showSignInModal}>admin</span>
                 ]}
               ></PageHeader>
-
             </Header>
             <Content>
-            <Carousel autoplay style={{
-                textAlign: 'center',
-                height: '25vw',
-                background: '#364d79',
-                overflow: 'hidden',
-              }}>
-                <div>
-                    <div className="carousel-item-1"
-                    style={{
-                    height:'50vh',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    }}>
-                    </div>
-                </div>
-                <div>
-                <div className="carousel-item-2"
-                    style={{
-                    height:'55vh',
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                    }}>
-                      should display image
-                    </div>
-                </div>
-                <div>
-                <div 
-                    className="carousel-item-3"
-                    style={{
-                    height:'50vh',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    }}>
-                      should display image
-                    </div>
-                </div>
-            </Carousel>
+
+              {this.state.userView ? 
+              <div>
+                {this.renderCarousel()}
+                {this.renderSignInModal()}
+              </div> 
+              :
+              <>
+              <AddFoodSection/>
+              </>
+              }
+
 
             <div style={{ background: '#ECECEC', padding: '30px' }}>
               <Row gutter={16}>
@@ -257,7 +267,6 @@ renderCardItems = () => {
               </Row>
             </div>
 
-              {this.renderSignInModal()}
 
             </Content>
             <Footer></Footer>

@@ -1,4 +1,4 @@
-import { takeLatest, call, put } from 'redux-saga/effects';
+import { takeLatest, put } from 'redux-saga/effects';
 import { fetchAllFoodSuccessAction } from './../actions';
 import { all } from 'redux-saga/effects';
 
