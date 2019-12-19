@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Card, Icon, Modal, PageHeader, Carousel, Col, Row,  Form, Input} from 'antd';
+import { Layout, Card, Icon, Modal, PageHeader, Col, Row,  Form, Input} from 'antd';
 import 'antd/dist/antd.css';
 import "firebase/auth";
 import "firebase/database";
@@ -11,6 +11,7 @@ import { fetchAllFoodAction } from '../redux/actions';
 // import foodSeedData from './../helpers';
 // import logo from './../assets/applogo.png';
 import './homepage.css';
+import Carousel from './../components/carousel';
 
 export class HomePage extends Component {
 
@@ -22,26 +23,8 @@ state = {
   password: null,
   loginMesCol: '#ffffff',
   unLoginMesCol: '#ffffff',
-  userView: false,
+  userView: true,
 }
-
-// seedData = async() => {
-//   for(let foodItem in foodSeedData){
-    // let foodObj = foodSeedData[foodItem];
-    // let price = foodObj.price;
-    // let onOffer = foodObj.onOffer;
-    // let photo = foodObj.photo;
-    // let description = foodObj.description;
-
-    // await firebaseObj.database().ref(`/data/${foodItem}`).set({
-    //   price,
-    //   onOffer,
-    //   photo,
-    //   description,
-    // })
-
-//   }
-// }
 
 componentDidMount(){
   // this.seedData();
@@ -101,7 +84,6 @@ handleOk = () => {
       loginMesCol: '#ffffff'
     });
   }, 2000);
-
 };
 
 
@@ -142,49 +124,6 @@ renderSignInModal = () => {
   );
 }
 
-renderCarousel = () => {
-  return( 
-      <Carousel autoplay style={{
-        textAlign: 'center',
-        height: '25vw',
-        background: '#364d79',
-        overflow: 'hidden',
-        }}>
-          <div>
-              <div className="carousel-item-1"
-              style={{
-              height:'50vh',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              }}>
-              </div>
-          </div>
-          <div>
-          <div className="carousel-item-2"
-              style={{
-              height:'55vh',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center',
-              }}>
-                should display image
-              </div>
-          </div>
-          <div>
-          <div 
-              className="carousel-item-3"
-              style={{
-              height:'50vh',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              }}>
-                should display image
-              </div>
-          </div>
-      </Carousel>
-    );
-}
-
 
 renderCardItems = () => {
   const { Meta } = Card;
@@ -214,10 +153,9 @@ renderCardItems = () => {
 
               </div>
             }
-          actions={[
-            <Icon type="setting" key="setting" />,
-            <Icon type="edit" key="edit" />,
-            <Icon type="ellipsis" key="ellipsis" />,
+          actions={ this.state.userView ? [<span>order</span>] : [
+            <span><Icon type="edit" key="edit" /></span>,
+            <span><Icon type="ellipsis" key="ellipsis" /></span>,
           ]}
         >
         <Meta style={{borderBottom: 'solid 0.2px #F5F5F5', marginBottom: '15px'}} title={item}/>
@@ -251,7 +189,7 @@ renderCardItems = () => {
 
               {this.state.userView ? 
               <div>
-                {this.renderCarousel()}
+                <Carousel/>
                 {this.renderSignInModal()}
               </div> 
               :
