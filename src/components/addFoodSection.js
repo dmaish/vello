@@ -42,6 +42,12 @@ export class AddFoodSection extends Component{
         });
     }
 
+    handleCancel = () => {
+        this.setState({
+            visible: false
+        })
+    }
+
     handleInputChange = (e) => {
         e.preventDefault();
         e.persist();

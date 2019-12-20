@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Layout, Card, Icon, Modal, PageHeader, Col, Row,  Form, Input} from 'antd';
+import { Layout, Card, Icon, Modal, PageHeader, Col, Row,  Form, Input } from 'antd';
 import 'antd/dist/antd.css';
 import "firebase/auth";
 import "firebase/database";
@@ -27,7 +27,6 @@ state = {
 }
 
 componentDidMount(){
-  // this.seedData();
   const {fetchAllFoodAction} = this.props;
   fetchAllFoodAction();
 }
@@ -86,6 +85,14 @@ handleOk = () => {
   }, 2000);
 };
 
+handleAdminCancel = e => {
+  console.log(e);
+  this.setState({
+    visible: false,
+  });
+};
+
+
 
 renderSignInModal = () => {
   const FormItem = Form.Item;
@@ -98,7 +105,7 @@ renderSignInModal = () => {
         visible={visible}
         onOk={this.handleOk}
         confirmLoading={confirmLoading}
-        onCancel={this.handleCancel}>
+        onCancel={this.handleAdminCancel}>
           <Form onSubmit={this.handleSubmit} autocomplete="off" >
               <FormItem
               label="username"
@@ -155,6 +162,13 @@ handleOrderInputChange = (e) => {
           });
   }
 
+  handleOrderCancel = e => {
+    console.log(e);
+    this.setState({
+      showOrderForm: false,
+    });
+  };
+
 handleOrderOk = async() => {
   const {foodItemName, quantity, amount, address, phoneNo} = this.state;
 
@@ -166,8 +180,8 @@ handleOrderOk = async() => {
   });
 
   this.setState({
-      visible: false,
-  })
+    showOrderForm: false,
+  });
 }
 
 showOrderForm = () => {
@@ -179,7 +193,7 @@ showOrderForm = () => {
     visible={this.state.showOrderForm}
     onOk={this.handleOrderOk}
     // confirmLoading={confirmLoading}
-    onCancel={this.handleCancel}>
+    onCancel={this.handleOrderCancel}>
         <Form onSubmit={this.handleSubmit} autocomplete="off" >
             <FormItem
             label="name"
@@ -272,6 +286,12 @@ renderCardItems = () => {
   });
 }
 
+showHomePage = () => {
+  this.setState({
+    userView: true,
+  });
+}
+
   render(){
 
     const { Header, Footer, Content } = Layout;
@@ -283,7 +303,7 @@ renderCardItems = () => {
             <PageHeader
                 title="Vello Foods"
                 extra={[
-                  <span style={{cursor: 'pointer'}} key="3">orders</span>,
+                  <span style={{cursor: 'pointer'}} key="3" onClick={this.showHomePage}>home</span>,
                   <span style={{cursor: 'pointer'}} key="2" onClick={this.showSignInModal}>admin</span>
                 ]}
               ></PageHeader>
@@ -297,7 +317,9 @@ renderCardItems = () => {
               </div> 
               :
               <>
-              <FoodOrders/>
+              <div style={{width: '80%', margin: '40px auto', background: '#ffffff'}}>
+                <FoodOrders/>
+              </div>
               <AddFoodSection/>
               </>
               }

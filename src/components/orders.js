@@ -29,7 +29,6 @@ export class FoodOrders extends Component {
             let orderItemObject = {...allOrders[item], item};
             return orderItemObject;
         });
-        console.log('ORDERSSS', orders);
         const dataSource = orders;
             const columns = [
             {
