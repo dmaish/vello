@@ -5,13 +5,12 @@ import 'antd/dist/antd.css';
 import "firebase/auth";
 import "firebase/database";
 
+import firebaseObj from './../firebase';
 import AddFoodSection from './../components/addFoodSection';
-// import firebaseObj from './../firebase';
 import { fetchAllFoodAction } from '../redux/actions';
-// import foodSeedData from './../helpers';
-// import logo from './../assets/applogo.png';
 import './homepage.css';
 import Carousel from './../components/carousel';
+import FoodOrders from './../components/orders';
 
 export class HomePage extends Component {
 
@@ -24,6 +23,7 @@ state = {
   loginMesCol: '#ffffff',
   unLoginMesCol: '#ffffff',
   userView: true,
+  showOrderForm: false,
 }
 
 componentDidMount(){
@@ -124,6 +124,107 @@ renderSignInModal = () => {
   );
 }
 
+orderFormDetails = (item, price) => {
+  this.setState({
+    showOrderForm: true,
+    foodItemName: item,
+    foodItemPrice: price,
+  });
+
+}
+
+handleOrderInputChange = (e) => {
+  e.preventDefault();
+  e.persist();
+
+  let inputId = e.target.id;
+  let value = e.target.value;
+
+  if (inputId === 'quantity'){
+      let number = Number(value);
+      const price = this.state.foodItemPrice;
+      let amount = price * number;
+
+      this.setState({
+          amount
+      })
+  }
+          this.setState((state) => {
+              state[inputId] = value;
+              return state;
+          });
+  }
+
+handleOrderOk = async() => {
+  const {foodItemName, quantity, amount, address, phoneNo} = this.state;
+
+  await firebaseObj.database().ref(`/orders/${foodItemName}`).set({
+      quantity,
+      amount,
+      address,
+      phoneNo,
+  });
+
+  this.setState({
+      visible: false,
+  })
+}
+
+showOrderForm = () => {
+  const FormItem = Form.Item;
+
+  return(
+    <Modal
+    title="food order details"
+    visible={this.state.showOrderForm}
+    onOk={this.handleOrderOk}
+    // confirmLoading={confirmLoading}
+    onCancel={this.handleCancel}>
+        <Form onSubmit={this.handleSubmit} autocomplete="off" >
+            <FormItem
+            label="name"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            >
+            <Input id="username" name="username"  value={this.state.foodItemName}/>
+            </FormItem>
+    
+            <FormItem
+            label="quantity"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            >
+            <Input id="quantity"   placeholder="quantity"  type="number" onChange={(e) => this.handleOrderInputChange(e)}/>
+            </FormItem>
+
+            <FormItem
+            label="amount"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            >
+            <Input id="amount"   placeholder="amount" value={this.state.amount}/>
+            </FormItem>
+
+            <FormItem
+            label="address"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            >
+            <Input id="address"   placeholder="address"  onChange={(e) => this.handleOrderInputChange(e)}/>
+            </FormItem>
+
+            <FormItem
+            label="phoneNo."
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+            >
+            <Input id="phoneNo"   placeholder="phoneNo."  onChange={(e) => this.handleOrderInputChange(e)}/>
+            </FormItem>
+        </Form>
+</Modal>
+  );
+}
+
 
 renderCardItems = () => {
   const { Meta } = Card;
@@ -152,10 +253,12 @@ renderCardItems = () => {
                 }}>
 
               </div>
+
             }
-          actions={ this.state.userView ? [<span>order</span>] : [
+          actions={ this.state.userView ? 
+            [<span onClick={() => this.orderFormDetails(item, foodItemObject.price)}><Icon type="smile" key="smile" /> order</span>] : [
             <span><Icon type="edit" key="edit" /></span>,
-            <span><Icon type="ellipsis" key="ellipsis" /></span>,
+            <span><Icon type="delete" key="delete" /></span>,
           ]}
         >
         <Meta style={{borderBottom: 'solid 0.2px #F5F5F5', marginBottom: '15px'}} title={item}/>
@@ -194,18 +297,16 @@ renderCardItems = () => {
               </div> 
               :
               <>
+              <FoodOrders/>
               <AddFoodSection/>
               </>
               }
-
-
+              {this.showOrderForm()}
             <div style={{ background: '#ECECEC', padding: '30px' }}>
               <Row gutter={16}>
                   {this.renderCardItems()}
               </Row>
             </div>
-
-
             </Content>
             <Footer></Footer>
           </Layout>

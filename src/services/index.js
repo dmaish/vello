@@ -10,6 +10,14 @@ class Services {
         return food;
     }
 
+    static async getAllOrdersService(){
+        let food;
+        food = await firebaseObj.database().ref('/orders').once('value').then(function async(snapshot){
+            return snapshot.val();
+        });
+        return food;
+    }
+
 }
 
 export default Services;

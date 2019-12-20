@@ -1,5 +1,5 @@
 import { takeLatest, put } from 'redux-saga/effects';
-import { fetchAllFoodSuccessAction } from './../actions';
+import { fetchAllFoodSuccessAction, fetchAllOrdersSuccessAction } from './../actions';
 import { all } from 'redux-saga/effects';
 
 import Service from './../../services'
@@ -19,9 +19,27 @@ export function* fetchAllFoodSaga() {
     }
 }
 
+export function* fetchAllOrdersWatcher() {
+    yield takeLatest('FETCH_ALL_ORDERS', fetchAllOrdersSaga);
+}
+
+export function* fetchAllOrdersSaga() {
+    try {
+        const allOrders = yield Service.getAllOrdersService();
+        console.log('allOrderssaga', allOrders);
+        yield put(fetchAllOrdersSuccessAction(allOrders));
+    } catch (error) {
+        
+    }
+}
+
+
+
 export default function* rootSaga() {
     yield all([
         fetchAllFoodWatcher(),
         fetchAllFoodSaga(),
+        fetchAllOrdersWatcher(),
+        fetchAllOrdersSaga(),
     ]);
 }
